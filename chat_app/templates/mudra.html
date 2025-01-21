@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanishq Chat</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8e1e1;
+    margin: 0;
+    padding: 0;
+}
+
+.chat-container {
+    width: 100%;
+    max-width: 400px; /* Maximum width for the chat container */
+    height: 90vh; /* Full height of the viewport */
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* For positioning the emoji picker */
+}
+
+
+.nav-bar {
+    display: flex;
+    align-items: center;
+    background-color: #ff6f61;
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-family: cursive;
+}
+
+.profile-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.nav-name {
+    color: white;
+    margin: 0;
+}
+
+.chat-box {
+    padding: 10px;
+    flex: 1; /* Allow chat box to grow */
+    overflow-y: auto; /* Enable scrolling */
+    background-color: #ffe4e1;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 70%; /* Limit message width */
+}
+
+.received {
+    background-color: #ffcccb; /* Color for received messages */
+    align-self: flex-start; /* Align received messages to the left */
+    border-radius: 0px 10px 10px 15px;
+}
+
+.sent {
+    background-color: #ffb6c1; /* Color for sent messages */
+    align-self: flex-end; /* Align sent messages to the right */
+    border-radius: 10px 0px 15px 10px;
+}
+
+.input-container {
+    display: flex;
+    padding: 10px;
+    background-color: #fff;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.emoji-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px; /* Size of the emoji button */
+    cursor: pointer;
+    margin-right: 10px; /* Space between emoji button and input */
+}
+
+.chat-input {
+    flex: 1; /* Take up remaining space */
+    padding: 10px;
+    border: 1px solid #ff6f61; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    margin-right: 10px; /* Space between input and send button */
+}
+
+.send-button {
+    background-color: #ff6f61; /* Send button color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.send-button:hover {
+    background-color: #ff4c4c; /* Darker color on hover */
+}
+
+.emoji-picker {
+    display: flex; /* Flexbox for emoji layout */
+    flex-wrap: wrap; /* Wrap emojis to the next line */
+    border: 1px solid #ff6f61; /* Border color */
+    background-color: #fff; /* Background color */
+    padding: 5px; /* Padding around emojis */
+    position: absolute; /* Positioning for dropdown */
+    bottom: 60px; /* Position above the input */
+    left: 10px; /* Align to the left */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    z-index: 1000; /* Ensure it appears above other elements */
+}
+
+.emoji {
+    font-size: 24px; /* Size of emojis */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin: 5px; /* Space between emojis */
+}
+
+/* Responsive Design */
+@media (max-width: 400px) {
+    .chat-container {
+        width: 100%; /* Full width on smaller screens */
+    }
+
+    .chat-input {
+        font-size: 14px; /* Smaller font size for input */
+    }
+
+    .send-button {
+        padding: 8px 12px; /* Smaller padding for buttons */
+    }
+
+    .emoji-button {
+        font-size: 20px; /* Smaller emoji button */
+    }
+
+    .emoji {
+        font-size: 20px;
+    } }
+
+    h4{
+        margin: 0;
+        padding: 0;
+        text-transform: capitalize;
+    }
+    </style>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="nav-bar">
+            <img src="/static/me.jpeg" alt="Profile Photo" class="profile-photo">
+            <h2 class="nav-name">Tanishq..</h2>
+        </div>
+        <div class="chat-box" id="chatBox">
+
+            
+            <!-- <div class="message received">okk</div> -->
+
+                
+
+        </div>
+        <form method="post" class="input-container" id="post-form">
+            {% csrf_token %}
+            <button class="emoji-button" onclick="toggleEmojiPicker()">😊</button>
+            <input type="text" spellcheck="true" autocomplete="off" placeholder="Type your message..." name="message" class="chat-input" id="chatInput" required>
+            <button class="send-button" onclick="sendMessage()">Send</button>
+        </form>
+        <div class="emoji-picker" id="emojiPicker" style="display: none;">
+            <span class="emoji" onclick="addEmoji('😊')">😊</span>
+            <span class="emoji" onclick="addEmoji('❤️')">❤️</span>
+            <span class="emoji" onclick="addEmoji('💖')">💖</span>
+            <span class="emoji" onclick="addEmoji('😄')">😄</span>
+            <span class="emoji" onclick="addEmoji('😢')">😢</span>
+            <span class="emoji" onclick="addEmoji('👍')">👍</span>
+            <span class="emoji" onclick="addEmoji('😎')">😎</span>
+            <span class="emoji" onclick="addEmoji('😍')">😍</span>
+            <span class="emoji" onclick="addEmoji('🤔')">🤔</span>
+            <span class="emoji" onclick="addEmoji('😡')">😡</span>
+            <span class="emoji" onclick="addEmoji('🥳')">🥳</span>
+            <span class="emoji" onclick="addEmoji('🤗')">🤗</span>
+            <span class="emoji" onclick="addEmoji('😇')">😇</span>
+            <span class="emoji" onclick="addEmoji('🤩')">🤩</span>
+            <span class="emoji" onclick="addEmoji('✨')">✨</span>
+
+        </div>
+    </div>
+
+    <script>
+ // Function to toggle the visibility of the emoji picker
+function toggleEmojiPicker() {
+    const emojiPicker = document.getElementById('emojiPicker');
+    emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'flex' : 'none';
+}
+
+// Function to add the selected emoji to the chat input
+function addEmoji(emoji) {
+    const chatInput = document.getElementById('chatInput');
+    chatInput.value += emoji; // Append the selected emoji to the input field
+    toggleEmojiPicker(); // Close the emoji picker after selecting an emoji
+}
+
+
+    $(document).on('submit','#post-form',function(e){
+        e.preventDefault();
+
+        $.ajax({
+        type:'POST',
+        url:'/send/mudra',
+        data:{
+            message:$('#chatInput').val(),
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function(data){
+            //alert(data)
+        }
+        });
+        document.getElementById('chatInput').value = ''
+    });
+
+    </script>
+
+    <script>
+$(document).ready(function() {
+            function fetchMessages() {
+                $.ajax({
+                    url: '/chat/',
+                    method: 'GET',
+                    success: function(data) {
+                        $('#chatBox').empty();
+                        data.messages.forEach(function(message) {
+                            if(message.user == 'tanishq')
+                            $('#chatBox').append("<div class='message received'> <h4>Tanishq</h4>"+ message.text +"</div>");
+                        else
+                            $('#chatBox').append("<div class='message sent'> <h4>Me</h4>"+ message.text +"</div>");
+                        });
+                    }
+                });
+            }
+        setInterval(fetchMessages, 2000);
+        });
+
+
+    </script>
+</body>
+</html>
